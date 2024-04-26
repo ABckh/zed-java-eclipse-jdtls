@@ -124,11 +124,16 @@ impl Extension for JavaExtension {
             }
             CompletionKind::Class | CompletionKind::Interface => {
                 let (name, _namespace) = completion.label.split_once(" - ")?;
+                let import_hint = format!(" (import {})", completion.detail?);
+                let code = format!("{name}{import_hint}");
 
                 Some(CodeLabel {
-                    code: name.to_string(),
-                    spans: vec![CodeLabelSpan::literal(name, Some("type".to_string()))],
+                    spans: vec![
+                        CodeLabelSpan::literal(name, Some("type".to_string())),
+                        CodeLabelSpan::literal(import_hint, None),
+                    ],
                     filter_range: (0..name.len()).into(),
+                    code,
                 })
             }
             CompletionKind::Keyword => Some(CodeLabel {
