@@ -111,12 +111,15 @@ impl Extension for JavaExtension {
     ) -> Option<CodeLabel> {
         match completion.kind? {
             CompletionKind::Method => {
-                let (name, _return_type) = completion.label.split_once(" : ")?;
+                let (name_and_params, return_type) = completion.label.split_once(" : ")?;
+                let (name, _) = name_and_params.split_once('(')?;
+                let code = format!("{return_type} {name_and_params}");
 
                 Some(CodeLabel {
-                    code: name.to_string(),
-                    spans: vec![CodeLabelSpan::code_range(0..name.len())],
-                    filter_range: (0..name.len()).into(),
+                    spans: vec![CodeLabelSpan::code_range(0..code.len())],
+                    filter_range: (return_type.len() + 1..return_type.len() + 1 + name.len())
+                        .into(),
+                    code,
                 })
             }
             CompletionKind::Class | CompletionKind::Interface => {
