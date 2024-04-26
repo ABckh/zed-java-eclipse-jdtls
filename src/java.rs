@@ -109,8 +109,6 @@ impl Extension for JavaExtension {
         _language_server_id: &LanguageServerId,
         completion: Completion,
     ) -> Option<CodeLabel> {
-        dbg!(&completion);
-
         match completion.kind? {
             CompletionKind::Method => {
                 let (name, _return_type) = completion.label.split_once(" : ")?;
@@ -121,7 +119,25 @@ impl Extension for JavaExtension {
                     filter_range: (0..name.len()).into(),
                 })
             }
-            _ => None,
+            CompletionKind::Class | CompletionKind::Interface => {
+                let (name, _namespace) = completion.label.split_once(" - ")?;
+
+                Some(CodeLabel {
+                    code: name.to_string(),
+                    spans: vec![CodeLabelSpan::literal(name, Some("type".to_string()))],
+                    filter_range: (0..name.len()).into(),
+                })
+            }
+            CompletionKind::Keyword => Some(CodeLabel {
+                spans: vec![CodeLabelSpan::code_range(0..completion.label.len())],
+                filter_range: (0..completion.label.len()).into(),
+                code: completion.label,
+            }),
+            _ => {
+                dbg!(&completion);
+
+                None
+            }
         }
     }
 }
