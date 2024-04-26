@@ -1,6 +1,6 @@
 id = "java-jdtls"
 name = "Java with Eclipse JDTLS"
-version = "0.0.1"
+version = "0.1.0"
 schema_version = 1
 authors = ["Yury Abykhodau <abehodau@gmail.com>", "Valentine Briese <valentinegb@icloud.com>"]
 description = "☕️ Java language support for Zed with Eclipse JDTLS"
