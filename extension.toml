@@ -1,9 +1,9 @@
 id = "java-support"
-name = "Java Support"
+name = "Java with Eclipse JDTLS"
 version = "0.0.1"
 schema_version = 1
 authors = ["Yury Abykhodau <abehodau@gmail.com>", "Valentine Briese <valentinegb@icloud.com>"]
-description = "Java language support for Zed with Eclipse JDTLS"
+description = "☕️ Java language support for Zed with Eclipse JDTLS"
 repository = "https://github.com/ABckh/zed-java-language-support-jdtls"
 
 [grammars.java]
