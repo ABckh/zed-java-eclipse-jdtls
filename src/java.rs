@@ -141,8 +141,12 @@ impl Extension for JavaExtension {
                 filter_range: (0..completion.label.len()).into(),
                 code: completion.label,
             }),
-            _ => {
-                dbg!(&completion);
+            kind => {
+                if let CompletionKind::Snippet = kind {
+                    // Ignore
+                } else {
+                    dbg!(&completion);
+                }
 
                 None
             }
