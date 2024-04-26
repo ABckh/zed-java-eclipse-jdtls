@@ -1,0 +1,15 @@
+id = "java-support"
+name = "Java Support"
+version = "0.0.1"
+schema_version = 1
+authors = ["Yury Abykhodau <abehodau@gmail.com>", "Valentine Briese <valentinegb@icloud.com>"]
+description = "Java language support for Zed with Eclipse JDTLS"
+repository = "https://github.com/ABckh/zed-java-language-support-jdtls"
+
+[grammars.java]
+repository = "https://github.com/tree-sitter/tree-sitter-java"
+commit = "953abfc8bb3eb2f578e1f461edba4a9885f974b8"
+
+[language_servers.java]
+language = "Java"
+name = "Eclipse JDTLS"
