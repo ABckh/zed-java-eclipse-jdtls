@@ -141,14 +141,14 @@ impl Extension for JavaExtension {
                 })
             }
             CompletionKind::Class | CompletionKind::Interface | CompletionKind::Enum => {
-                let name = completion.label.split(" - ").next()?;
-                let import_hint = format!(" (import {})", completion.detail?);
-                let code = format!("{name}{import_hint}");
+                let (name, namespace) = completion.label.split_once(" - ")?;
+                let namespace_hint = format!(" ({namespace})");
+                let code = format!("{name}{namespace_hint}");
 
                 Some(CodeLabel {
                     spans: vec![
                         CodeLabelSpan::literal(name, Some("type".to_string())),
-                        CodeLabelSpan::literal(import_hint, None),
+                        CodeLabelSpan::literal(namespace_hint, None),
                     ],
                     filter_range: (0..name.len()).into(),
                     code,
