@@ -112,7 +112,7 @@ impl Extension for JavaExtension {
         match completion.kind? {
             CompletionKind::Method => {
                 let (name_and_params, return_type) = completion.label.split_once(" : ")?;
-                let (name, _) = name_and_params.split_once('(')?;
+                let name = name_and_params.split('(').next()?;
                 let code = format!("{return_type} {name_and_params}");
 
                 Some(CodeLabel {
@@ -122,8 +122,26 @@ impl Extension for JavaExtension {
                     code,
                 })
             }
+            CompletionKind::Field | CompletionKind::Constant => {
+                let (name, r#type) = completion.label.split_once(" : ")?;
+                let code = format!("{type} {name}");
+                let highlight_name = match completion.kind? {
+                    CompletionKind::Field => Some("property".to_string()),
+                    CompletionKind::Constant => Some("constant".to_string()),
+                    _ => None,
+                };
+
+                Some(CodeLabel {
+                    spans: vec![
+                        CodeLabelSpan::code_range(0..r#type.len() + 1),
+                        CodeLabelSpan::literal(name, highlight_name),
+                    ],
+                    filter_range: (0..code.len()).into(),
+                    code,
+                })
+            }
             CompletionKind::Class | CompletionKind::Interface | CompletionKind::Enum => {
-                let (name, _) = completion.label.split_once(" - ")?;
+                let name = completion.label.split(" - ").next()?;
                 let import_hint = format!(" (import {})", completion.detail?);
                 let code = format!("{name}{import_hint}");
 
@@ -142,7 +160,7 @@ impl Extension for JavaExtension {
                 code: completion.label,
             }),
             CompletionKind::EnumMember => {
-                let (name, _) = completion.label.split_once(" : ")?;
+                let name = completion.label.split(" : ").next()?;
 
                 Some(CodeLabel {
                     code: name.to_string(),
