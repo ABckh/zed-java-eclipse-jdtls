@@ -180,10 +180,11 @@ impl Extension for JavaExtension {
                 })
             }
             kind => {
-                if let CompletionKind::Snippet = kind {
-                    // Ignore
-                } else {
-                    dbg!(&completion);
+                match kind {
+                    CompletionKind::Module | CompletionKind::Snippet => (), // Ignore
+                    _ => {
+                        dbg!(&completion);
+                    }
                 }
 
                 None
