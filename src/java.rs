@@ -122,6 +122,17 @@ impl Extension for JavaExtension {
                     code,
                 })
             }
+            CompletionKind::Constructor => {
+                let new = "new ";
+                let code = format!("{new}{}", completion.label);
+                let name = completion.label.split('(').next()?;
+
+                Some(CodeLabel {
+                    spans: vec![CodeLabelSpan::code_range(new.len()..code.len())],
+                    filter_range: (0..name.len()).into(),
+                    code,
+                })
+            }
             CompletionKind::Variable | CompletionKind::Field | CompletionKind::Constant => {
                 let (name, r#type) = completion.label.split_once(" : ")?;
                 let code = format!("{type} {name}");
