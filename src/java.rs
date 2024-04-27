@@ -122,7 +122,7 @@ impl Extension for JavaExtension {
                     code,
                 })
             }
-            CompletionKind::Field | CompletionKind::Constant => {
+            CompletionKind::Variable | CompletionKind::Field | CompletionKind::Constant => {
                 let (name, r#type) = completion.label.split_once(" : ")?;
                 let code = format!("{type} {name}");
                 let highlight_name = match completion.kind? {
