@@ -122,8 +122,8 @@ impl Extension for JavaExtension {
                     code,
                 })
             }
-            CompletionKind::Class | CompletionKind::Interface => {
-                let (name, _namespace) = completion.label.split_once(" - ")?;
+            CompletionKind::Class | CompletionKind::Interface | CompletionKind::Enum => {
+                let (name, _) = completion.label.split_once(" - ")?;
                 let import_hint = format!(" (import {})", completion.detail?);
                 let code = format!("{name}{import_hint}");
 
@@ -141,6 +141,15 @@ impl Extension for JavaExtension {
                 filter_range: (0..completion.label.len()).into(),
                 code: completion.label,
             }),
+            CompletionKind::EnumMember => {
+                let (name, _) = completion.label.split_once(" : ")?;
+
+                Some(CodeLabel {
+                    code: name.to_string(),
+                    spans: vec![CodeLabelSpan::code_range(0..name.len())],
+                    filter_range: (0..name.len()).into(),
+                })
+            }
             kind => {
                 if let CompletionKind::Snippet = kind {
                     // Ignore
