@@ -179,16 +179,7 @@ impl Extension for JavaExtension {
                     filter_range: (0..name.len()).into(),
                 })
             }
-            kind => {
-                match kind {
-                    CompletionKind::Module | CompletionKind::Snippet => (), // Ignore
-                    _ => {
-                        dbg!(&completion);
-                    }
-                }
-
-                None
-            }
+            _ => None,
         }
     }
 }
