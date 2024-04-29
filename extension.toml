@@ -1,4 +1,4 @@
-id = "java-jdtls"
+id = "java-eclipse-jdtls"
 name = "Java with Eclipse JDTLS"
 version = "0.1.0"
 schema_version = 1
