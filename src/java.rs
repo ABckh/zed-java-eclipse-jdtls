@@ -113,7 +113,7 @@ impl Extension for JavaExtension {
             CompletionKind::Method => {
                 let (name_and_params, return_type) = completion.label.split_once(" : ")?;
                 let name = name_and_params.split('(').next()?;
-                let code = format!("{return_type} {name_and_params}");
+                let code = format!("{name_and_params} : {return_type}");
 
                 Some(CodeLabel {
                     spans: vec![CodeLabelSpan::code_range(0..code.len())],
