@@ -147,10 +147,11 @@ impl Extension for JavaExtension {
 
                 Some(CodeLabel {
                     spans: vec![
-                        CodeLabelSpan::code_range(0..r#type.len() + 1),
                         CodeLabelSpan::literal(name, highlight_name),
+                        CodeLabelSpan::literal(" : ", None),
+                        CodeLabelSpan::code_range(0..r#type.len()),
                     ],
-                    filter_range: (0..code.len()).into(),
+                    filter_range: (0..name.len()).into(),
                     code,
                 })
             }
