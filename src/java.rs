@@ -41,14 +41,17 @@ impl JavaExtension {
             },
         )?;
 
-        let asset_name = "eclipse.jdt.ls.tar.gz";
+        let (platform, _arch) = current_platform();
+        let asset_name = match platform {
+            Os::Mac | Os::Linux => "eclipse.jdt.ls.tar.gz",
+            Os::Windows => "eclipse.jdt.ls.zip",
+        };
         let asset = release
             .assets
             .iter()
             .find(|asset| asset.name == asset_name)
             .ok_or_else(|| format!("no asset found matching {:?} \n", asset_name))?;
 
-        let (platform, _arch) = current_platform();
         let version_dir = "eclipse.jdt.ls";
         let binary_path = format!("{version_dir}/bin/jdtls");
 
