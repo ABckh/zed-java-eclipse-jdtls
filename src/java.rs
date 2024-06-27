@@ -3,9 +3,10 @@ use std::fs;
 use zed_extension_api::{
     current_platform, download_file, latest_github_release,
     lsp::{Completion, CompletionKind},
-    make_file_executable, register_extension, set_language_server_installation_status, CodeLabel,
-    CodeLabelSpan, DownloadedFileType, Extension, GithubReleaseOptions, LanguageServerId,
-    LanguageServerInstallationStatus, Os, Result, Worktree,
+    make_file_executable, register_extension, set_language_server_installation_status,
+    settings::LspSettings,
+    CodeLabel, CodeLabelSpan, DownloadedFileType, Extension, GithubReleaseOptions,
+    LanguageServerId, LanguageServerInstallationStatus, Os, Result, Worktree,
 };
 
 struct JavaExtension {
@@ -105,6 +106,18 @@ impl Extension for JavaExtension {
             args: Vec::new(),
             env: Default::default(),
         })
+    }
+
+    fn language_server_workspace_configuration(
+        &mut self,
+        language_server_id: &LanguageServerId,
+        worktree: &Worktree,
+    ) -> Result<Option<serde_json::Value>> {
+        // jdtls only accepts settings via. workspace/didChangeConfiguration, not
+        // initialization options, so pass the user's initialization options to
+        // workspace/didChangeConfiguration as well.
+        let settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
+        Ok(settings.initialization_options)
     }
 
     fn label_for_completion(
