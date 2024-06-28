@@ -54,7 +54,11 @@ impl JavaExtension {
             .ok_or_else(|| format!("no asset found matching {:?} \n", asset_name))?;
 
         let version_dir = "eclipse.jdt.ls";
-        let binary_path = format!("{version_dir}/bin/jdtls");
+        let binary_name = match platform {
+            Os::Mac | Os::Linux => "jdtls",
+            Os::Windows => "jdtls.bat",
+        };
+        let binary_path = format!("{version_dir}/bin/{binary_name}");
 
         if !fs::metadata(&binary_path).map_or(false, |stat| stat.is_file()) {
             set_language_server_installation_status(
