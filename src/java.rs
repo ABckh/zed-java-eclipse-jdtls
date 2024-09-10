@@ -129,10 +129,12 @@ impl Extension for JavaExtension {
         _language_server_id: &LanguageServerId,
         completion: Completion,
     ) -> Option<CodeLabel> {
+        let label = completion.label.clone();
+        let detail = completion.detail?;
         match completion.kind? {
             CompletionKind::Method => {
-                let (name_and_params, return_type) = completion.label.split_once(" : ")?;
-                let name = name_and_params.split('(').next()?;
+                let (full_name_and_params, return_type) = detail.split_once(" : ")?;
+                let (_, name_and_params) = full_name_and_params.split_once('.')?;
                 let code = format!("{return_type} {name_and_params}");
 
                 Some(CodeLabel {
@@ -141,24 +143,22 @@ impl Extension for JavaExtension {
                         CodeLabelSpan::literal(" : ", None),
                         CodeLabelSpan::code_range(0..return_type.len()),
                     ],
-                    filter_range: (0..name.len()).into(),
+                    filter_range: (0..name_and_params.len()).into(),
                     code,
                 })
             }
             CompletionKind::Constructor => {
-                let new = "new ";
-                let code = format!("{new}{}", completion.label);
-                let name = completion.label.split('(').next()?;
+                let (_, params) = detail.split_once('(')?;
+                let code = format!("{label}({params}");
 
                 Some(CodeLabel {
-                    spans: vec![CodeLabelSpan::code_range(new.len()..code.len())],
-                    filter_range: (0..name.len()).into(),
+                    spans: vec![CodeLabelSpan::code_range(0..code.len())],
+                    filter_range: (0..label.len()).into(),
                     code,
                 })
             }
             CompletionKind::Variable | CompletionKind::Field | CompletionKind::Constant => {
-                let (name, r#type) = completion.label.split_once(" : ")?;
-                let code = format!("{type} {name}");
+                let code = format!("{detail} {label}");
                 let highlight_name = match completion.kind? {
                     CompletionKind::Field => Some("property".to_string()),
                     CompletionKind::Constant => Some("constant".to_string()),
@@ -167,42 +167,35 @@ impl Extension for JavaExtension {
 
                 Some(CodeLabel {
                     spans: vec![
-                        CodeLabelSpan::literal(name, highlight_name),
+                        CodeLabelSpan::literal(label, highlight_name),
                         CodeLabelSpan::literal(" : ", None),
-                        CodeLabelSpan::code_range(0..r#type.len()),
+                        CodeLabelSpan::code_range(0..detail.len()),
                     ],
-                    filter_range: (0..name.len()).into(),
+                    filter_range: (0..completion.label.len()).into(),
                     code,
                 })
             }
-            CompletionKind::Class | CompletionKind::Interface | CompletionKind::Enum => {
-                let (name, namespace) = completion.label.split_once(" - ")?;
-                let namespace_hint = format!(" ({namespace})");
-                let code = format!("{name}{namespace_hint}");
+            CompletionKind::Class
+            | CompletionKind::Interface
+            | CompletionKind::Enum
+            | CompletionKind::Struct => {
+                let namespace_hint = format!(" ({detail})");
+                let code = format!("{label}{namespace_hint}");
 
                 Some(CodeLabel {
                     spans: vec![
-                        CodeLabelSpan::literal(name, Some("type".to_string())),
+                        CodeLabelSpan::literal(label, Some("type".to_string())),
                         CodeLabelSpan::literal(namespace_hint, None),
                     ],
-                    filter_range: (0..name.len()).into(),
+                    filter_range: (0..completion.label.len()).into(),
                     code,
                 })
             }
-            CompletionKind::Keyword => Some(CodeLabel {
-                spans: vec![CodeLabelSpan::code_range(0..completion.label.len())],
+            CompletionKind::EnumMember | CompletionKind::Keyword => Some(CodeLabel {
+                spans: vec![CodeLabelSpan::code_range(0..label.len())],
+                code: label,
                 filter_range: (0..completion.label.len()).into(),
-                code: completion.label,
             }),
-            CompletionKind::EnumMember => {
-                let name = completion.label.split(" : ").next()?;
-
-                Some(CodeLabel {
-                    code: name.to_string(),
-                    spans: vec![CodeLabelSpan::code_range(0..name.len())],
-                    filter_range: (0..name.len()).into(),
-                })
-            }
             _ => None,
         }
     }
