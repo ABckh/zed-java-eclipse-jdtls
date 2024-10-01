@@ -92,43 +92,21 @@
 [
   "abstract"
   "assert"
-  "break"
-  "case"
   "catch"
-  "class"
-  "continue"
-  "default"
-  "do"
-  "else"
-  "enum"
-  "exports"
   "extends"
   "final"
   "finally"
-  "for"
-  "if"
   "implements"
-  "import"
   "instanceof"
-  "interface"
-  "module"
   "native"
-  "new"
   "non-sealed"
   "open"
-  "opens"
-  "package"
   "private"
   "protected"
-  "provides"
   "public"
-  "requires"
-  "record"
-  "return"
   "sealed"
   "static"
   "strictfp"
-  "switch"
   "synchronized"
   "throw"
   "throws"
@@ -136,8 +114,137 @@
   "transient"
   "transitive"
   "try"
-  "uses"
   "volatile"
-  "while"
   "with"
 ] @keyword
+
+[
+  "return"
+  "yield"
+] @keyword.return
+
+; Lambda parameter
+(inferred_parameters
+  (identifier) @variable.parameter) ; (x,y) -> ...
+
+(lambda_expression
+  parameters: (identifier) @variable.parameter) ; x -> ...
+
+[
+  "record"
+  "class"
+  "enum"
+  "interface"
+] @keyword.type
+
+(synchronized_statement
+  "synchronized" @keyword)
+
+(modifiers
+  "synchronized" @keyword.modifier)
+
+(ternary_expression
+  [
+    "?"
+    ":"
+  ] @keyword.conditional.ternary)
+
+
+; [
+;   "abstract"
+;   "final"
+;   "native"
+;   "non-sealed"
+;   "open"
+;   "private"
+;   "protected"
+;   "public"
+;   "sealed"
+;   "static"
+;   "strictfp"
+;   "transitive"
+; ] @keyword.modifier
+
+
+[
+  "transient"
+  "volatile"
+] @keyword.modifier
+
+
+"new" @keyword.operator
+
+; Conditionals
+[
+  "if"
+  "else"
+  "switch"
+  "case"
+  "when"
+  "default"
+] @keyword.conditional
+
+
+; Loops
+[
+  "for"
+  "while"
+  "do"
+  "continue"
+  "break"
+] @keyword.repeat
+
+; Includes
+[
+  "exports"
+  "import"
+  "module"
+  "opens"
+  "package"
+  "provides"
+  "requires"
+  "uses"
+] @keyword.import
+
+(import_declaration
+  (asterisk
+    "*" @character.special))
+
+; Operators
+[
+  "+"
+  ":"
+  "++"
+  "-"
+  "--"
+  "&"
+  "&&"
+  "|"
+  "||"
+  "!"
+  "!="
+  "=="
+  "*"
+  "/"
+  "%"
+  "<"
+  "<="
+  ">"
+  ">="
+  "="
+  "-="
+  "+="
+  "*="
+  "/="
+  "%="
+  "->"
+  "^"
+  "^="
+  "&="
+  "|="
+  "~"
+  ">>"
+  ">>>"
+  "<<"
+  "::"
+] @operator
