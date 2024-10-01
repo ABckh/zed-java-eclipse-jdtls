@@ -1,0 +1,8 @@
+name = "Properties"
+grammar = "properties"
+path_suffixes = ["properties"]
+line_comments = ["# ", "! "]
+autoclose_before = "=}"
+brackets = []
+prettier_parser_name = "properties"
+prettier_plugins = ["prettier-plugin-properties"]
