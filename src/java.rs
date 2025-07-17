@@ -1,3 +1,4 @@
+use serde_json::Value;
 use std::fs;
 
 use zed_extension_api::{
@@ -91,6 +92,24 @@ impl JavaExtension {
         self.cached_binary_path = Some(binary_path.clone());
         Ok(binary_path)
     }
+
+    fn get_java_home(
+        &self,
+        language_server_id: &LanguageServerId,
+        worktree: &Worktree,
+    ) -> Option<String> {
+        if let Ok(settings) = LspSettings::for_worktree(language_server_id.as_ref(), worktree) {
+            if let Some(settings_value) = &settings.settings {
+                if let Some(java_home) = settings_value.get("java_home") {
+                    if let Some(java_home_str) = java_home.as_str() {
+                        return Some(java_home_str.to_string());
+                    }
+                }
+            }
+        }
+
+        std::env::var("JAVA_HOME").ok()
+    }
 }
 
 impl Extension for JavaExtension {
@@ -105,10 +124,17 @@ impl Extension for JavaExtension {
         language_server_id: &LanguageServerId,
         worktree: &Worktree,
     ) -> Result<zed_extension_api::Command> {
+        let mut env = Vec::new();
+
+        // Set JAVA_HOME if configured
+        if let Some(java_home) = self.get_java_home(language_server_id, worktree) {
+            env.push(("JAVA_HOME".to_string(), java_home));
+        }
+
         Ok(zed_extension_api::Command {
             command: self.language_server_binary_path(language_server_id, worktree)?,
             args: Vec::new(),
-            env: Default::default(),
+            env,
         })
     }
 
@@ -116,12 +142,12 @@ impl Extension for JavaExtension {
         &mut self,
         language_server_id: &LanguageServerId,
         worktree: &Worktree,
-    ) -> Result<Option<serde_json::Value>> {
+    ) -> Result<Option<Value>> {
         // jdtls only accepts settings via. workspace/didChangeConfiguration, not
         // initialization options, so pass the user's initialization options to
         // workspace/didChangeConfiguration as well.
-        let settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
-        Ok(settings.initialization_options)
+        LspSettings::for_worktree(language_server_id.as_ref(), worktree)
+            .map(|lsp_settings| lsp_settings.settings)
     }
 
     fn label_for_completion(

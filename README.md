@@ -13,11 +13,18 @@ To configure the LSP options, you can utilize the same fields provided by VSCode
 2. **Set Custom Options:**
    Add the relevant fields in the configuration file to match the options provided in the [VSCode Java support documentation](https://github.com/redhat-developer/vscode-java#configuration).
 
+3. **Specify jdk for jdtls to use**
+  JDT Language Server (jdtls) requires Java 17 or higher to run. However, if you're working on a project that uses an older version of Java (e.g., Java 8 or 11), you can still use jdtls by pointing it to a compatible Java runtime.
+  To do this, set the java_home property in the settings section of your configuration file. This tells jdtls which JDK to use, regardless of the Java version your project is targeting.
+
 ```json
 {
   "lsp": {
     "java": {
         "java.jdt.ls.lombokSupport.enabled:": true
+        "settings": {
+            "java_home": "/opt/homebrew/opt/openjdk@21",
+        }
     }
   }
 }
